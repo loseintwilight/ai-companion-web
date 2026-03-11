@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live2D 完整诊断</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        #canvas-container {
+            width: 400px;
+            height: 600px;
+            border: 2px solid #ddd;
+            margin: 20px auto;
+            background: #f0f0f0;
+            position: relative;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Live2D 完整诊断工具</h1>
+    
+    <div class="section">
+        <h2>1. SDK 加载状态</h2>
+        <div id="sdk-status">检测中...</div>
+    </div>
+
+    <div class="section">
+        <h2>2. 模型文件检测</h2>
+        <div id="model-files">检测中...</div>
+    </div>
+
+    <div class="section">
+        <h2>3. WebGL 支持</h2>
+        <div id="webgl-status">检测中...</div>
+    </div>
+
+    <div class="section">
+        <h2>4. 模型加载测试</h2>
+        <button onclick="testModelLoad()">测试加载模型</button>
+        <div id="model-test"></div>
+        <div id="canvas-container">
+            <canvas id="test-canvas"></canvas>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5. 详细日志</h2>
+        <pre id="log"></pre>
+    </div>
+
+    <script>
+        const log = [];
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            log.push(`[${timestamp}] ${message}`);
+            document.getElementById('log').textContent = log.join('\n');
+            console.log(message);
+        }
+
+        // 1. 检查 SDK
+        function checkSDK() {
+            const status = document.getElementById('sdk-status');
+            let html = '<h3>SDK 类检测:</h3><ul>';
+
+            const classes = [
+                'Live2D',
+                'Live2DModelWebGL',
+                'Live2DMotion',
+                'MotionQueueManager',
+                'L2DMatrix44',
+                'Live2DMatrix44',
+                'Live2DModelMatrix',
+                'L2DEyeBlink',
+                'L2DPose',
+                'PhysicsHandler'
+            ];
+
+            classes.forEach(className => {
+                const exists = typeof window[className] !== 'undefined';
+                const type = typeof window[className];
+                const icon = exists ? '✅' : '❌';
+                const color = exists ? 'success' : 'error';
+                html += `<li class="${color}">${icon} ${className}: ${type}</li>`;
+                addLog(`${className}: ${type}`);
+            });
+
+            html += '</ul>';
+
+            // 检查是否是占位符实现
+            if (window.Live2DModelWebGL) {
+                try {
+                    const model = new window.Live2DModelWebGL();
+                    if (model.initialized !== undefined) {
+                        html += '<p class="warning">⚠️ 检测到占位符实现（功能有限）</p>';
+                        addLog('Warning: Using placeholder implementation', 'warning');
+                    } else {
+                        html += '<p class="success">✅ 使用完整 SDK 实现</p>';
+                        addLog('Using full SDK implementation', 'success');
+                    }
+                } catch (e) {
+                    html += `<p class="error">❌ 实例化失败: ${e.message}</p>`;
+                    addLog(`Instantiation failed: ${e.message}`, 'error');
+                }
+            }
+
+            status.innerHTML = html;
+        }
+
+        // 2. 检查模型文件
+        async function checkModelFiles() {
+            const status = document.getElementById('model-files');
+            const basePath = '/live2d/rem/rem';
+            
+            const files = [
+                'model.json',
+                'remu.moc',
+                'remu2048/texture_00.png',
+                'remu2048/texture_01.png',
+                'remu.physics.json',
+                'remu.pose.json'
+            ];
+
+            let html = '<h3>模型文件检测:</h3><ul>';
+
+            for (const file of files) {
+                const url = `${basePath}/${file}`;
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const icon = response.ok ? '✅' : '❌';
+                    const color = response.ok ? 'success' : 'error';
+                    const size = response.headers.get('content-length');
+                    html += `<li class="${color}">${icon} ${file} (${response.status}) ${size ? size + ' bytes' : ''}</li>`;
+                    addLog(`${file}: ${response.status} ${size ? size + ' bytes' : ''}`);
+                } catch (e) {
+                    html += `<li class="error">❌ ${file}: ${e.message}</li>`;
+                    addLog(`${file}: Error - ${e.message}`, 'error');
+                }
+            }
+
+            html += '</ul>';
+            status.innerHTML = html;
+        }
+
+        // 3. 检查 WebGL
+        function checkWebGL() {
+            const status = document.getElementById('webgl-status');
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+            if (gl) {
+                const info = {
+                    version: gl.getParameter(gl.VERSION),
+                    vendor: gl.getParameter(gl.VENDOR),
+                    renderer: gl.getParameter(gl.RENDERER),
+                    maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE)
+                };
+
+                let html = '<p class="success">✅ WebGL 支持</p>';
+                html += '<ul>';
+                html += `<li>版本: ${info.version}</li>`;
+                html += `<li>供应商: ${info.vendor}</li>`;
+                html += `<li>渲染器: ${info.renderer}</li>`;
+                html += `<li>最大纹理尺寸: ${info.maxTextureSize}</li>`;
+                html += '</ul>';
+
+                status.innerHTML = html;
+                addLog(`WebGL: ${info.version}`);
+            } else {
+                status.innerHTML = '<p class="error">❌ WebGL 不支持</p>';
+                addLog('WebGL not supported', 'error');
+            }
+        }
+
+        // 4. 测试模型加载
+        async function testModelLoad() {
+            const testDiv = document.getElementById('model-test');
+            testDiv.innerHTML = '<p class="info">⏳ 正在测试模型加载...</p>';
+            addLog('Starting model load test...');
+
+            try {
+                // 检查 SDK
+                if (!window.Live2D || !window.Live2DModelWebGL) {
+                    throw new Error('Live2D SDK 未加载');
+                }
+
+                // 加载配置
+                const configUrl = '/live2d/rem/rem/model.json';
+                addLog(`Loading config from: ${configUrl}`);
+                const configResponse = await fetch(configUrl);
+                if (!configResponse.ok) {
+                    throw new Error(`配置文件加载失败: ${configResponse.status}`);
+                }
+                const config = await configResponse.json();
+                addLog(`Config loaded: ${config.name || 'Unknown'}`);
+
+                // 加载 MOC
+                const mocUrl = `/live2d/rem/rem/${config.model}`;
+                addLog(`Loading MOC from: ${mocUrl}`);
+                const mocResponse = await fetch(mocUrl);
+                if (!mocResponse.ok) {
+                    throw new Error(`MOC 文件加载失败: ${mocResponse.status}`);
+                }
+                const mocBuffer = await mocResponse.arrayBuffer();
+                addLog(`MOC loaded: ${mocBuffer.byteLength} bytes`);
+
+                // 创建模型
+                addLog('Creating Live2D model...');
+                let model;
+                try {
+                    model = window.Live2DModelWebGL.loadModel(mocBuffer);
+                } catch (e) {
+                    addLog(`loadModel failed, trying new: ${e.message}`, 'warning');
+                    model = new window.Live2DModelWebGL();
+                    model.loadModel(mocBuffer);
+                }
+
+                if (!model) {
+                    throw new Error('模型创建失败');
+                }
+
+                addLog('Model created successfully!', 'success');
+
+                // 初始化 Canvas
+                const canvas = document.getElementById('test-canvas');
+                const gl = canvas.getContext('webgl');
+                if (!gl) {
+                    throw new Error('WebGL 上下文创建失败');
+                }
+
+                addLog('WebGL context created');
+
+                // 设置 Live2D
+                if (window.Live2D.setGL) {
+                    window.Live2D.setGL(gl);
+                    addLog('Live2D GL context set');
+                }
+
+                // 加载纹理
+                addLog('Loading textures...');
+                for (let i = 0; i < config.textures.length; i++) {
+                    const textureUrl = `/live2d/rem/rem/${config.textures[i]}`;
+                    addLog(`Loading texture ${i}: ${textureUrl}`);
+                    
+                    const img = await new Promise((resolve, reject) => {
+                        const image = new Image();
+                        image.crossOrigin = 'anonymous';
+                        image.onload = () => resolve(image);
+                        image.onerror = reject;
+                        image.src = textureUrl;
+                    });
+
+                    const texture = gl.createTexture();
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    
+                    model.setTexture(i, texture);
+                    addLog(`Texture ${i} loaded and set`);
+                }
+
+                // 尝试绘制
+                addLog('Attempting to draw model...');
+                gl.viewport(0, 0, canvas.width, canvas.height);
+                gl.clearColor(0.9, 0.9, 0.9, 1.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                if (model.draw) {
+                    model.draw();
+                    addLog('Model draw() called', 'success');
+                } else {
+                    addLog('Model.draw() not available', 'warning');
+                }
+
+                testDiv.innerHTML = '<p class="success">✅ 模型加载测试完成！检查上方 Canvas 是否显示模型。</p>';
+                addLog('Model load test completed!', 'success');
+
+            } catch (error) {
+                testDiv.innerHTML = `<p class="error">❌ 测试失败: ${error.message}</p>`;
+                addLog(`Test failed: ${error.message}`, 'error');
+                console.error('Model load test error:', error);
+            }
+        }
+
+        // 页面加载时执行检查
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addLog('Starting diagnostics...');
+                checkSDK();
+                checkModelFiles();
+                checkWebGL();
+            }, 1000);
+        });
+    </script>
+
+    <!-- 加载 Live2D SDK -->
+    <script src="/lib/live2d.min.js"></script>
+</body>
+</html>

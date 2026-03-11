@@ -1,0 +1,104 @@
+# 环境配置文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python虚拟环境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React构建文件
+frontend/build/
+
+# 日志文件
+logs/
+*.log
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 测试覆盖率报告
+coverage/
+htmlcov/
+.coverage
+.pytest_cache/
+
+# 临时文件
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Docker
+.dockerignore
+
+# 进程ID文件
+*.pid
+
+# 备份文件
+*.bak
+*.backup
+
+# 编辑器临时文件
+*~
+.swp
+.swo
+
+# 系统文件
+.DS_Store
+desktop.ini
+# Electron 构建产物/临时文件
+app.asar
+*.exe
+*.dmg
+*.deb
+electron-builder.yml
+out/          # Electron 打包输出目录
+frontend/electron/build/  # 如果Electron代码在frontend/electron下
+# Live2D 模型文件（根据实际路径调整）
+live2d/
+*.moc
+*.png         # 仅忽略模型纹理，保留项目其他png
+*.json        # 仅忽略模型配置，保留业务json

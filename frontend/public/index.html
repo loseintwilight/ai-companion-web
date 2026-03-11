@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="description" content="AI伴侣Web应用 - 现代化的AI聊天界面" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>AI伴侣</title>
+</head>
+<body>
+  <noscript>您需要启用JavaScript才能运行此应用。</noscript>
+  <div id="root"></div>
+  
+  <!-- Live2D Cubism 2 SDK (原生 WebGL 版本) -->
+  <script src="%PUBLIC_URL%/lib/live2d.min.js"></script>
+  
+  <script>
+    // 检查 Live2D SDK 状态
+    function checkLive2D() {
+      console.log('=== Live2D SDK 检查 ===');
+      console.log('window.Live2D:', typeof window.Live2D);
+      console.log('window.Live2DModelWebGL:', typeof window.Live2DModelWebGL);
+      
+      if (window.Live2D && window.Live2DModelWebGL) {
+        console.log('✅ Live2D Cubism 2 SDK 就绪');
+        window.dispatchEvent(new CustomEvent('live2dRuntimeReady'));
+        return true;
+      }
+      
+      console.error('❌ Live2D SDK 未就绪');
+      return false;
+    }
+    
+    // 延迟检查确保脚本加载完成
+    setTimeout(checkLive2D, 500);
+  </script>
+</body>
+</html>

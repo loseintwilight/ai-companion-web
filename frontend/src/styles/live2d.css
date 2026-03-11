@@ -1,0 +1,299 @@
+/**
+ * Live2D组件样式
+ */
+
+/* Live2D容器基础样式 */
+.live2d-character-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.live2d-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.live2d-canvas-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .live2d-character-container {
+    min-height: 200px;
+    max-height: 300px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .live2d-character-container {
+    min-height: 300px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .live2d-character-container {
+    min-height: 400px;
+  }
+}
+
+/* 加载动画 */
+.live2d-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.live2d-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: live2d-spin 1s linear infinite;
+}
+
+@keyframes live2d-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 错误状态 */
+.live2d-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 20px;
+  background: rgba(254, 242, 242, 0.9);
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.live2d-error-icon {
+  width: 32px;
+  height: 32px;
+  color: #ef4444;
+  margin: 0 auto 8px;
+}
+
+.live2d-error-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #dc2626;
+  margin-bottom: 4px;
+}
+
+.live2d-error-message {
+  font-size: 12px;
+  color: #b91c1c;
+  margin-bottom: 12px;
+}
+
+.live2d-error-retry {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.live2d-error-retry:hover {
+  background: #dc2626;
+}
+
+/* 控制面板 */
+.live2d-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.live2d-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live2d-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: live2d-pulse 2s infinite;
+}
+
+@keyframes live2d-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.live2d-status-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.live2d-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live2d-state-indicator {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: capitalize;
+  padding: 2px 6px;
+  background: rgba(107, 114, 128, 0.1);
+  border-radius: 4px;
+}
+
+.live2d-hide-button {
+  padding: 4px;
+  color: #9ca3af;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.live2d-hide-button:hover {
+  color: #6b7280;
+}
+
+/* 显示切换按钮 */
+.live2d-toggle-button {
+  position: fixed;
+  z-index: 50;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.live2d-toggle-button:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.live2d-toggle-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .live2d-toggle-button {
+    bottom: 80px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .live2d-toggle-button svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .live2d-controls {
+    padding: 8px 12px;
+  }
+  
+  .live2d-status-text {
+    font-size: 12px;
+  }
+  
+  .live2d-state-indicator {
+    font-size: 10px;
+  }
+}
+
+/* 桌面端适配 */
+@media (min-width: 769px) {
+  .live2d-toggle-button {
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+  }
+  
+  .live2d-toggle-button:hover {
+    transform: translateY(-50%) scale(1.05);
+  }
+}
+
+/* 调试信息 */
+.live2d-debug {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  line-height: 1.4;
+  max-width: 200px;
+  word-break: break-all;
+}
+
+.live2d-debug div {
+  margin-bottom: 2px;
+}
+
+.live2d-debug div:last-child {
+  margin-bottom: 0;
+}
+
+/* 平滑过渡 */
+.live2d-character-container * {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 禁用选择 */
+.live2d-canvas-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .live2d-canvas-container canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
