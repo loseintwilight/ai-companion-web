@@ -98,11 +98,7 @@ async def detailed_health_check(db: AsyncSession = Depends(get_db)):
     services_info = {
         "api": "healthy",
         "database": db_info["status"],
-        "ai_providers": {
-            "openai": "configured" if settings.OPENAI_API_KEY else "not_configured",
-            "bytedance": "configured" if settings.BYTEDANCE_API_KEY else "not_configured",
-            "baidu": "configured" if settings.BAIDU_API_KEY else "not_configured"
-        }
+        "ai_providers": "available"
     }
     
     overall_status = "healthy"
