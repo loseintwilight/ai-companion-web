@@ -3,8 +3,8 @@
 """
 
 from fastapi import APIRouter
-from pydantic import BaseModel
-from typing import List, Dict, Any
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
 
 router = APIRouter()
 
@@ -19,10 +19,10 @@ class ModelInfo(BaseModel):
 
 class ModelConfigRequest(BaseModel):
     """模型配置请求模型"""
-    provider: str
-    api_key: str
-    model_name: str
-    endpoint: str = None
+    provider: str = Field(..., max_length=50)
+    api_key: str = Field(..., min_length=1, max_length=256)
+    model_name: str = Field(..., max_length=100)
+    endpoint: Optional[str] = Field(None, max_length=512)
 
 
 class SettingsResponse(BaseModel):

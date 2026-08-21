@@ -14,11 +14,11 @@ httpx==0.25.2
 aiofiles==23.2.1
 
 # WebSocket支持
-python-socketio==5.10.0
-python-socketio[asyncio_client]==5.10.0
+python-socketio>=5.14.0
+python-socketio[asyncio_client]>=5.14.0
 
 # 安全和认证
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]>=3.4.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 
