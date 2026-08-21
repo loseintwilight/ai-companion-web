@@ -2,8 +2,8 @@
 聊天相关API端点
 """
 
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, Query
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 
@@ -12,9 +12,9 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     """聊天请求模型"""
-    message: str
-    session_id: Optional[str] = None
-    context_length: int = 10
+    message: str = Field(..., min_length=1, max_length=5000)
+    session_id: Optional[str] = Field(None, max_length=128)
+    context_length: int = Field(10, ge=0, le=100)
 
 
 class ChatResponse(BaseModel):
@@ -46,7 +46,11 @@ async def send_message(request: ChatRequest):
 
 
 @router.get("/history", response_model=ChatHistoryResponse)
-async def get_chat_history(session_id: str, limit: int = 50, offset: int = 0):
+async def get_chat_history(
+    session_id: str = Query(..., max_length=128),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0)
+):
     """获取聊天历史端点（占位实现）"""
     # TODO: 实现历史记录获取逻辑
     return ChatHistoryResponse(
