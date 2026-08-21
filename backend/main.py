@@ -82,7 +82,7 @@ def create_app() -> FastAPI:
         allow_origins=settings.ALLOWED_ORIGINS,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allow_headers=["*"],
+        allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
         expose_headers=["X-Process-Time"],
     )
     
@@ -97,7 +97,7 @@ def create_app() -> FastAPI:
             status_code=500,
             content={
                 "error": "内部服务器错误",
-                "message": "服务暂时不可用，请稍后重试" if not settings.DEBUG else str(exc),
+                "message": "服务暂时不可用，请稍后重试",
                 "timestamp": time.time()
             }
         )

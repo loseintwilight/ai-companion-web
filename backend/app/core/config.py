@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # 基础配置
     APP_NAME: str = "AI伴侣Web应用"
-    DEBUG: bool = True
+    DEBUG: bool = False
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     
