@@ -309,12 +309,14 @@ export async function diagnoseAndFixMatrix(
   return true;
 }
 
-// 暴露到全局供控制台调用
-(window as any).diagnoseAndFixMatrix = diagnoseAndFixMatrix;
-(window as any).createCorrectModelMatrix = createCorrectModelMatrix;
-(window as any).drawDebugPattern = drawDebugPattern;
+// 暴露到全局供控制台调用（仅开发环境）
+if (process.env.NODE_ENV === 'development') {
+  (window as any).diagnoseAndFixMatrix = diagnoseAndFixMatrix;
+  (window as any).createCorrectModelMatrix = createCorrectModelMatrix;
+  (window as any).drawDebugPattern = drawDebugPattern;
 
-console.log('✅ Live2D 矩阵诊断工具已加载');
-console.log('💡 使用方法:');
-console.log('   diagnoseAndFixMatrix(canvas, model)');
-console.log('   drawDebugPattern(gl, canvas)');
+  console.log('✅ Live2D 矩阵诊断工具已加载');
+  console.log('💡 使用方法:');
+  console.log('   diagnoseAndFixMatrix(canvas, model)');
+  console.log('   drawDebugPattern(gl, canvas)');
+}

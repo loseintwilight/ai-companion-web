@@ -313,9 +313,11 @@ export async function debugLive2D(modelPath: string): Promise<DebugResult[]> {
   return results;
 }
 
-// 注册到全局
-(window as any).debugLive2D = debugLive2D;
-console.log('✅ Live2D 调试工具已加载');
-console.log('💡 使用方法: await debugLive2D("/live2d/rem/rem/model.json")');
+// 注册到全局（仅开发环境）
+if (process.env.NODE_ENV === 'development') {
+  (window as any).debugLive2D = debugLive2D;
+  console.log('✅ Live2D 调试工具已加载');
+  console.log('💡 使用方法: await debugLive2D("/live2d/rem/rem/model.json")');
+}
 
 export default debugLive2D;
